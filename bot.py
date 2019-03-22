@@ -44,7 +44,8 @@ async def help(ctx):
     )
 
     embed.set_author(name='Help')
-    embed.add_field(name='?echo', value='Returns entered string', inline=False)
+    embed.add_field(name='?ping', value='Displays Pong!', inline=False)
+    embed.add_field(name='?help', value='Displays this message', inline=False)
 
     await client.send_message(author, embed=embed)
 
