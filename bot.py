@@ -6,9 +6,10 @@ A Discord Bot
 """
 
 import discord
+from discord.ext import commands
 import logging
 import os
-from discord.ext import commands
+import youtube_dl
 
 # Log config
 logger = logging.getLogger('discord')
@@ -23,6 +24,8 @@ TOKEN = os.environ['AYEGA_TOKEN']
 client = commands.Bot(command_prefix='?')
 # Remove default help command
 client.remove_command('help')
+
+players = { }
 
 
 @client.event
@@ -61,5 +64,15 @@ async def leave(ctx):
     server = ctx.message.server
     voice_client = client.voice_client_in(server)
     await voice_client.disconnect()
+
+
+@client.command(pass_context=True)
+async def play(ctx, url):
+    server = ctx.message.server
+    voice_client = client.voice_client_in(server)
+    player = await voice_client.create_ytdl_player(url)
+    players[server.id] = player
+    player.start()
+
 
 client.run(TOKEN)
