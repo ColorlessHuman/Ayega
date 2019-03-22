@@ -21,15 +21,20 @@ logger.addHandler(handler)
 TOKEN = os.environ['AYEGA_TOKEN']
 
 client = commands.Bot(command_prefix='?')
+# Remove default help command
+client.remove_command('help')
+
 
 @client.event
 async def on_ready():
-    await client.change_presence(game=discord.Game(name='Command Prefix = ?'))
+    await client.change_presence(game=discord.Game(name='Half Life 3'))
     print('Apna Time Ayega!')
+
 
 @client.command()
 async def ping():
     await client.say('Pong!')
+
 
 @client.command()
 async def echo(*args):
@@ -39,5 +44,18 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
+
+@client.command()
+async def help(ctx):
+    author = ctx.message.author
+    embed = discord.Embed(
+        color=discord.Color.orange()
+    )
+
+    embed.set_author(name='Help')
+    embed.add_field(name='?ping', value='Returns Pong!', inline=False)
+    embed.add_field(name='?echo', value='Returns entered string', inline=False)
+
+    await client.send_message(author, embed=embed)
 
 client.run(TOKEN)
