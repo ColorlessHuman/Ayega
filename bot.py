@@ -25,7 +25,15 @@ client = commands.Bot(command_prefix='?')
 # Remove default help command
 client.remove_command('help')
 
-players = { }
+players = {}
+queues = {}
+
+
+def check_queue(id):
+    if queues[id] != []:
+        player = queues[id].pop(0)
+        players[id] = player
+        player.start()
 
 
 @client.event
@@ -68,11 +76,52 @@ async def leave(ctx):
 
 @client.command(pass_context=True)
 async def play(ctx, url):
+    # Join voice channel before playing audio
+    channel = ctx.message.author.voice.voice_channel
+    await client.join_voice_channel(channel)
+
     server = ctx.message.server
     voice_client = client.voice_client_in(server)
-    player = await voice_client.create_ytdl_player(url)
+    player = await voice_client.create_ytdl_player(url, after=lambda: check_queue(server.id))
     players[server.id] = player
     player.start()
 
+
+@client.command(pass_context=True)
+async def pause(ctx):
+    id = ctx.message.server.id
+    players[id].pause()
+
+
+@client.command(pass_context=True)
+async def stop(ctx):
+    id = ctx.message.server.id
+    players[id].stop()
+
+
+@client.command(pass_context=True)
+async def resume(ctx):
+    id = ctx.message.server.id
+    players[id].resume()
+
+
+@client.command(pass_context=True)
+async def queue(ctx, url):
+    server = ctx.message.server
+    voice_client = client.voice_client_in(server)
+    player = await voice_client.create_ytdl_player(url, after=lambda: check_queue(server.id))
+
+    if server.id in queues:
+        queues[server.id].append(player)
+    else:
+        queues[server.id] = [player]
+
+    await client.say('Total {} video(s) queued.'.format(len(queues[server.id])))
+
+
+@client.command(pass_context=True)
+async def skip(ctx):
+    server = ctx.message.server
+    check_queue(server.id)
 
 client.run(TOKEN)
