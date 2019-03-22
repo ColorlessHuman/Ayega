@@ -35,4 +35,12 @@ async def on_ready():
 async def ping():
     await client.say('Pong!')
 
+@client.command()
+async def echo(*kwargs):
+    output = ''
+    for word in kwargs:
+        output += word
+        output += ' '
+    await client.say(output)
+
 client.run(TOKEN)
