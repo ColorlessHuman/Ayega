@@ -36,16 +36,7 @@ async def ping():
     await client.say('Pong!')
 
 
-@client.command()
-async def echo(*args):
-    output = ''
-    for word in args:
-        output += word
-        output += ' '
-    await client.say(output)
-
-
-@client.command()
+@client.command(pass_context=True)
 async def help(ctx):
     author = ctx.message.author
     embed = discord.Embed(
@@ -53,7 +44,6 @@ async def help(ctx):
     )
 
     embed.set_author(name='Help')
-    embed.add_field(name='?ping', value='Returns Pong!', inline=False)
     embed.add_field(name='?echo', value='Returns entered string', inline=False)
 
     await client.send_message(author, embed=embed)
